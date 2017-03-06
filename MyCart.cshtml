@@ -1,0 +1,46 @@
+﻿<h3>My Cart</h3>
+@{
+    ViewBag.Title = "My Cart";
+
+    <div class="container-fluid">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <table id="myCartGrid" data-source="@Url.Action("GetCartProducts", "Home")"></table>
+            </div>
+        </div>
+    </div>
+}
+<script>
+
+        grid = $("#myCartGrid").grid({
+        dataKey: "ProductID",
+        uiLibrary: "bootstrap",
+        columns: [
+          { field: "ProductID", title: "ID", width:43, sortable: true },
+          { field: "ProductName", title: "Product", width:200, sortable: true },
+          { field: "Price", title: "Price", type: 'formatCurrency', width: 50, sortable: true},
+          {
+              field: "Remove", title: "", width: 34, type: "icon",
+              icon: "glyphicon glyphicon-trash", tooltip: "Remove", events: { "click": removeFromCart }
+          }
+        ],
+        pager: { enable: true, limit: 5, sizes: [5, 10, 20] }
+        });
+
+        function removeFromCart(e) {
+            $.ajax({
+                url: '@Url.Action("RemoveFromCart", "Home")',
+                data: { productID: e.data.record.ProductID },
+                cache: false,
+                dataType: "html",
+                success: function (data) {
+                    location.reload();
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert(xhr.status + ", " + thrownError);
+                }
+            });
+        }
+</script>
+
+Cart Total: $@ViewBag.cartTotal

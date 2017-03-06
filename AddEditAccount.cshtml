@@ -1,0 +1,70 @@
+﻿@model TheWidgetStore.ViewModels.UserAccountViewModel
+@{
+    <h2>Create Account</h2>
+    <form action="" id="createUserForm">
+        <div class="formDiv">
+            <div class="form-group">
+                <div class="form-group">@Html.TextBox("Name", null, new { @class = "form-control", @placeholder = "Name" })</div>
+                <div class="form-group">@Html.TextBox("Email", null, new { @class = "form-control", @placeholder = "Email" })</div>
+                <div class="form-group">@Html.Password("Password", null, new { @class = "form-control", @placeholder = "Password" })</div>
+                <button class="btn btn-default" type="submit">Save</button>
+                <div id="errorMessage"></div>
+            </div>
+        </div>
+    </form>
+
+    <script>
+
+    $('#createUserForm').submit(function (e) {
+        e.preventDefault();
+        if (validateCreateUserForm()) {
+            $.ajax({
+                url: '@Url.Action("CreateUserAccount", "Home")',
+                        type: 'POST',
+                        data: $('#createUserForm').serialize(),
+                        success: function (msg) {
+                            if (msg != "") {
+                                $("#errorMessage").html(msg);
+                            }
+                            else {
+                                alert("Save Complete!");
+                                document.location.href="/";
+                            }
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert(xhr.status + ", " + thrownError);
+                        }
+                    });
+                }
+            });
+
+    function validateCreateUserForm() {
+        var errorMsg = "";
+        var fieldValue;
+        var re = /^[A-Z0-9._%+-]+@('@')([A-Z0-9-]+\.)+[A-Z]{2,4}$/i;
+
+        var fieldNameArray = new Array("Email", "Password", "PilotName");
+        var fieldLabelArray = new Array("Email", "Password", "Pilot Name");
+        for (var i = 0; i < fieldNameArray.length; i++) {
+
+            fieldValue = $("#createUserForm input[name= "+fieldNameArray[i]+"]").val();
+            if (fieldValue == "") {
+                errorMsg += "Please enter a value for " + fieldLabelArray[i] + " \n";
+            }
+        }
+
+        fieldValue = $("#createUserForm input[name=Email]").val();
+        if (fieldValue != ""  && !re.test(fieldValue)) {
+            errorMsg += "Please provide a valid Email address.\n";
+        }
+
+        if (errorMsg != "") {
+            alert(errorMsg);
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+    </script>
+}

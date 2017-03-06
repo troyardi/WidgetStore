@@ -1,0 +1,47 @@
+﻿<div id="messageBox"></div>
+
+<h3>Widgets</h3>
+
+@{
+    <div class="container-fluid">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <table id="productListingGrid" data-source="@Url.Action("GetProductListing", "Home")"></table>
+            </div>
+        </div>
+    </div>
+}
+    <script>
+
+        grid = $("#productListingGrid").grid({
+        dataKey: "ProductID",
+        uiLibrary: "bootstrap",
+        columns: [
+          { field: "ProductID", title: "ID", width:43, sortable: true },
+          { field: "ProductName", title: "Product", width:200, sortable: true },
+          { field: "Price", title: "Price", type: 'currency', width: 50, sortable: true},
+          {
+              field: "AddToCart", title: "", width: 34, type: "icon",
+              icon: "glyphicon glyphicon-shopping-cart", tooltip: "Add To Cart", events: { "click": AddToCart }
+          }
+        ],
+        pager: { enable: true, limit: 5, sizes: [5, 10, 20] }
+        });
+
+        function AddToCart(e) {
+            $.ajax({
+                url: '@Url.Action("AddToCart", "Home")',
+                data: { productID: e.data.record.ProductID},
+                cache: false,
+                dataType: "html",
+                success: function (data) {
+                    var msg = e.data.record.ProductName + " added to cart!";
+                    $("#messageBox").text(msg);
+                    $("#messageBox").show();
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert(xhr.status + ", " + thrownError);
+                }
+            });
+        }
+    </script>
